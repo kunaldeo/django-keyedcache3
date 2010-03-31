@@ -22,7 +22,13 @@ except AttributeError:
     CACHE_PREFIX = str(settings.SITE_ID)
     log.warn("No CACHE_PREFIX found in settings, using SITE_ID.  Please update your settings to add a CACHE_PREFIX")
 
-_CACHE_ENABLED = settings.CACHE_TIMEOUT > 0
+try:
+    CACHE_TIMEOUT = settings.CACHE_TIMEOUT
+except AttributeError:
+    CACHE_TIMEOUT = 0
+    log.warn("No CACHE_TIMEOUT found in settings, so we used 0, disabling the cache system.  Please update your settings to add a CACHE_TIMEOUT and avoid this warning.")
+
+_CACHE_ENABLED = CACHE_TIMEOUT > 0
 
 class CacheWrapper(object):
     def __init__(self, val, inprocess=False):
@@ -43,18 +49,18 @@ class CacheWrapper(object):
 
     wrap = classmethod(wrap)
 
-class MethodNotFinishedError(Exception): 
+class MethodNotFinishedError(Exception):
     def __init__(self, f):
         self.func = f
 
 
-class NotCachedError(Exception):    
+class NotCachedError(Exception):
     def __init__(self, k):
         self.key = k
 
-class CacheNotRespondingError(Exception):    
+class CacheNotRespondingError(Exception):
     pass
-    
+
 def cache_delete(*keys, **kwargs):
     removed = []
     if cache_enabled():
@@ -64,7 +70,7 @@ def cache_delete(*keys, **kwargs):
 
         if (keys or kwargs):
             key = cache_key(*keys, **kwargs)
-    
+
             if CACHED_KEYS.has_key(key):
                 del CACHED_KEYS[key]
                 removed.append(key)
@@ -81,13 +87,13 @@ def cache_delete(*keys, **kwargs):
         else:
             key = "All Keys"
             deleteneeded = _cache_flush_all()
-        
+
             removed = CACHED_KEYS.keys()
 
             if deleteneeded:
                 for k in CACHED_KEYS:
                     cache.delete(k)
-            
+
             CACHED_KEYS = {}
 
         if removed:
@@ -115,7 +121,7 @@ def _cache_flush_all():
         return False
     return True
 
-def cache_function(length=settings.CACHE_TIMEOUT):
+def cache_function(length=CACHE_TIMEOUT):
     """
     A variant of the snippet posted by Jeff Wheeler at
     http://www.djangosnippets.org/snippets/109/
@@ -137,8 +143,8 @@ def cache_function(length=settings.CACHE_TIMEOUT):
         def inner_func(*args, **kwargs):
             if not cache_enabled():
                 value = func(*args, **kwargs)
-                
-            else:        
+
+            else:
                 try:
                     value = cache_get('func', func.__name__, func.__module__, args, kwargs)
 
@@ -151,7 +157,7 @@ def cache_function(length=settings.CACHE_TIMEOUT):
                     cache_set(e.key, value=funcwrapper, length=length, skiplog=True)
                     value = func(*args, **kwargs)
                     cache_set(e.key, value=value, length=length)
-                
+
                 except MethodNotFinishedError, e:
                     value = func(*args, **kwargs)
 
@@ -168,7 +174,7 @@ def cache_get(*keys, **kwargs):
         use_default = False
 
     key = cache_key(keys, **kwargs)
-    
+
     if not cache_enabled():
         raise NotCachedError(key)
     else:
@@ -176,7 +182,7 @@ def cache_get(*keys, **kwargs):
         CACHE_CALLS += 1
         if CACHE_CALLS == 1:
             cache_require()
-        
+
         obj = None
         tid = -1
         if REQUEST_CACHE['enabled']:
@@ -190,16 +196,16 @@ def cache_get(*keys, **kwargs):
 
         if obj == None:
             obj = cache.get(key)
-            
+
         if obj and isinstance(obj, CacheWrapper):
             CACHE_HITS += 1
             CACHED_KEYS[key] = True
             log.debug('got cached [%i/%i]: %s', CACHE_CALLS, CACHE_HITS, key)
             if obj.inprocess:
                 raise MethodNotFinishedError(obj.val)
-            
+
             cache_set_request(key, obj, uid=tid)
-            
+
             return obj.val
         else:
             try:
@@ -209,7 +215,7 @@ def cache_get(*keys, **kwargs):
 
             if use_default:
                 return default_value
-    
+
             raise NotCachedError(key)
 
 
@@ -218,7 +224,7 @@ def cache_set(*keys, **kwargs):
     if cache_enabled():
         global CACHED_KEYS, REQUEST_CACHE
         obj = kwargs.pop('value')
-        length = kwargs.pop('length', settings.CACHE_TIMEOUT)
+        length = kwargs.pop('length', CACHE_TIMEOUT)
         skiplog = kwargs.pop('skiplog', False)
 
         key = cache_key(keys, **kwargs)
@@ -245,12 +251,12 @@ def cache_contains(*keys, **kwargs):
     return CACHED_KEYS.has_key(key)
 
 def cache_key(*keys, **pairs):
-    """Smart key maker, returns the object itself if a key, else a list 
+    """Smart key maker, returns the object itself if a key, else a list
     delimited by ':', automatically hashing any non-scalar objects."""
 
     if is_string_like(keys):
         keys = [keys]
-        
+
     if is_list_or_tuple(keys):
         if len(keys) == 1 and is_list_or_tuple(keys[0]):
             keys = keys[0]
@@ -264,7 +270,7 @@ def cache_key(*keys, **pairs):
         for k in klist:
             keys.append(k)
             keys.append(pairs[k])
-    
+
     key = KEY_DELIM.join([_hash_or_string(x) for x in keys])
     prefix = CACHE_PREFIX + KEY_DELIM
     if not key.startswith(prefix):
@@ -310,7 +316,7 @@ def cache_use_request_caching():
 def cache_get_request_uid():
     from threaded_multihost import threadlocals
     return threadlocals.get_thread_variable('request_uid', -1)
-    
+
 def cache_set_request(key, val, uid=None):
     if uid == None:
         uid = cache_get_request_uid()
