@@ -326,4 +326,4 @@ def cache_set_request(key, val, uid=None):
         if not uid in REQUEST_CACHE:
             REQUEST_CACHE[uid] = {key:val}
         else:
-            REQUEST_CACHE[tid][key] = val
+            REQUEST_CACHE[uid][key] = val
