@@ -1,8 +1,9 @@
-from django.conf.urls.defaults import patterns, include
+from django.conf.urls.defaults import *
 from django.contrib import admin
 
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^admin/settings/$', include('livesettings.urls')),
+    (r'^settings/', include('livesettings.urls')),
+    (r'^admin/', include(admin.site.urls)),
 )
