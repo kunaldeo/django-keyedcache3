@@ -4,6 +4,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 urlpatterns = patterns('',
-    (r'^settings/', include('livesettings.urls')),
+    (r'^cache/', include('keyedcache.urls')),
+    (r'^accounts/login/', 'django.contrib.auth.views.login', {'template_name': 'admin/login.html'}),
     (r'^admin/', include(admin.site.urls)),
 )
