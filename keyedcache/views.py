@@ -56,8 +56,8 @@ def stats_page(request):
     ctx = RequestContext(request, {
         'cache_count' : len(keyedcache.CACHED_KEYS),
         'cache_running' : running,
-        'cache_time' : settings.CACHE_TIMEOUT,
-        'cache_backend' : settings.CACHE_BACKEND,
+        'cache_time' : keyedcache.CACHE_TIMEOUT,
+        'cache_backend' : keyedcache.CACHE_BACKEND,
         'cache_calls' : keyedcache.CACHE_CALLS,
         'cache_hits' : keyedcache.CACHE_HITS,
         'hit_rate' : "%02.1f" % rate

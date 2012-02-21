@@ -17,16 +17,38 @@ CACHE_HITS = 0
 KEY_DELIM = "::"
 REQUEST_CACHE = {'enabled' : False}
 try:
-    CACHE_PREFIX = settings.CACHE_PREFIX
+    CACHES = getattr(settings, "CACHES")
+    CACHE_BACKEND = CACHES['default']['BACKEND']
+    try:
+        CACHE_PREFIX = CACHES['default']['KEY_PREFIX']
+    except KeyError:
+        CACHE_PREFIX = str(settings.SITE_ID)
+        log.warn("No KEY_PREFIX found in settings.CACHES['default'], using SITE_ID.  Please update your settings to add a CACHES")
+    
+    try:
+        CACHE_TIMEOUT = CACHES['default']['TIMEOUT']
+    except KeyError:
+        CACHE_TIMEOUT = 0
+        log.warn("No TIMEOUT found in settings.CACHES['default'], so we used 0, disabling the cache system.  Please update your settings to add a TIMEOUT and avoid this warning.")
+    
 except AttributeError:
-    CACHE_PREFIX = str(settings.SITE_ID)
-    log.warn("No CACHE_PREFIX found in settings, using SITE_ID.  Please update your settings to add a CACHE_PREFIX")
+    try:
+        CACHE_BACKEND = settings.CACHE_BACKEND
+    except AttributeError:
+        CACHE_BACKEND = "locmem://"
+        log.warn("No cache settings are set. Using default locmem. Please update your settings")
+    
+    try:
+        CACHE_PREFIX = settings.CACHE_PREFIX
+    except AttributeError:
+        CACHE_PREFIX = str(settings.SITE_ID)
+        log.warn("No CACHE_PREFIX found in settings, using SITE_ID.  Please update your settings to add a CACHE_PREFIX")
 
-try:
-    CACHE_TIMEOUT = settings.CACHE_TIMEOUT
-except AttributeError:
-    CACHE_TIMEOUT = 0
-    log.warn("No CACHE_TIMEOUT found in settings, so we used 0, disabling the cache system.  Please update your settings to add a CACHE_TIMEOUT and avoid this warning.")
+    try:
+        CACHE_TIMEOUT = settings.CACHE_TIMEOUT
+    except AttributeError:
+        CACHE_TIMEOUT = 0
+        log.warn("No CACHE_TIMEOUT found in settings, so we used 0, disabling the cache system.  Please update your settings to add a CACHE_TIMEOUT and avoid this warning.")
 
 _CACHE_ENABLED = CACHE_TIMEOUT > 0
 
