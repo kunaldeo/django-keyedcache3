@@ -28,8 +28,11 @@ try:
     try:
         CACHE_TIMEOUT = CACHES['default']['TIMEOUT']
     except KeyError:
-        CACHE_TIMEOUT = 0
-        log.warn("No TIMEOUT found in settings.CACHES['default'], so we used 0, disabling the cache system.  Please update your settings to add a TIMEOUT and avoid this warning.")
+        CACHE_TIMEOUT = getattr(settings, 'CACHE_TIMEOUT', 0)
+        log.warn("No TIMEOUT found in settings.CACHES['default'], so we used %s%s. "
+                 "Please update your settings to add a TIMEOUT and avoid this warning.",
+                 CACHE_TIMEOUT,
+                 CACHE_TIMEOUT == 0 and ", disabling the cache system" or "")
     
 except AttributeError:
     try:
