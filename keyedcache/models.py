@@ -31,7 +31,11 @@ class CachedObjectMixin(object):
         
     def is_cached(self, *args, **kwargs):
         return keyedcache.is_cached(self.cache_key(*args, **kwargs))
-        
+
+
+# Unused functions find_by_id, find_by_key, find_by_slug are coming from
+# Satchmo but are currently unused also there.
+
 def find_by_id(cls, groupkey, objectid, raises=False):
     """A helper function to look up an object by id"""
     ob = None

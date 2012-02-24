@@ -271,6 +271,9 @@ def _hash_or_string(key):
         except AttributeError:
             return md5_hash(key)
 
+# this function is unused in all known apps and raises an
+# exception on CACHED_KEYS if used:
+# AttributeError: 'list' object has no attribute 'has_key'
 def cache_contains(*keys, **kwargs):
     key = cache_key(keys, **kwargs)
     return CACHED_KEYS.has_key(key)
@@ -280,12 +283,14 @@ def cache_key(*keys, **pairs):
     delimited by ':', automatically hashing any non-scalar objects."""
 
     if is_string_like(keys):
+        assert False, "This code is never visited due to python rules"
         keys = [keys]
 
     if is_list_or_tuple(keys):
         if len(keys) == 1 and is_list_or_tuple(keys[0]):
             keys = keys[0]
     else:
+        assert False, "This code is never visited due to python rules"
         keys = [md5_hash(keys)]
 
     if pairs:
