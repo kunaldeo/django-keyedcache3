@@ -4,7 +4,10 @@ import logging
 log = logging.getLogger('keyedcache')
 
 class CachedObjectMixin(object):
-    """Provides basic object keyedcache for any objects using this as a mixin."""
+    """Provides basic object keyedcache for any objects using this as a mixin.
+
+    The class name of the object should be unambiguous.
+    """
 
     def cache_delete(self, *args, **kwargs):
         key = self.cache_key(*args, **kwargs)
@@ -31,7 +34,7 @@ class CachedObjectMixin(object):
         
     def is_cached(self, *args, **kwargs):
         return keyedcache.is_cached(self.cache_key(*args, **kwargs))
-
+        
 
 # Unused functions find_by_id, find_by_key, find_by_slug are coming from
 # Satchmo but are currently unused also there.

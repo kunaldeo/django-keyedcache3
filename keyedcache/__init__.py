@@ -1,4 +1,19 @@
-"""A full cache system written on top of Django's rudimentary one."""
+"""A full cache system written on top of Django's rudimentary one.
+
+Frequently used functions are:
+    cache_set(*keys, **kwargs)
+    cache_get(*keys, **kwargs)
+    cache_delete(*keys, **kwargs)
+keys.. parameters of general type which are convertable to string or hashable unambiguously.
+The keys can be of any general type which is convertable to string unambiguously or hashable.
+Every unknown kwarg is interpreted like two aditional keys: (key, val).
+Example:
+    cache_set('product', 123, value=product)
+    # is the same as
+    cache_set('product::123', value=product)
+
+More info below about parameters.
+"""
 
 from django.conf import settings
 from django.core.cache import cache
@@ -11,9 +26,17 @@ import types
 
 log = logging.getLogger('keyedcache')
 
+# The debugging variable CACHED_KEYS is exact only with the the Django
+# debugging server (or any single worker process server) and without restarting
+# the server between restarts of the main cache (memcached).
+# Keys in CACHED_KEYS variable never expire and can eat much memory on long
+# running servers. Currently it is not confirmed in Satchmo.
+# If more worker processes are used, the reported values of the following three
+# variables can skip randomly upwards downwards.
 CACHED_KEYS = {}
 CACHE_CALLS = 0
 CACHE_HITS = 0
+
 KEY_DELIM = "::"
 REQUEST_CACHE = {'enabled' : False}
 try:
@@ -87,11 +110,28 @@ class CacheNotRespondingError(Exception):
     pass
 
 def cache_delete(*keys, **kwargs):
+    """
+    Deletes the object identified by all ``keys`` from the cache.
+
+    keys:
+        Parameters of general type which are convertable to string or hashable
+        unambiguously.
+    kwargs:
+        children:
+            If it is True more objects starting with these keys are deleted.
+        other kwargs:
+            Unknown key=val is interpreted like two aditional keys: (key, val)
+
+    If no keys are present, all cached objects are to be deleted.
+    Deleting multiple multiple or all objects is usually not complete if the
+    project is running with multiple worker processes.
+    (It is reliable e.g. with a development server.)
+    """
     removed = []
     if cache_enabled():
         global CACHED_KEYS
         log.debug('cache_delete')
-        children = kwargs.pop('children',False)
+        children = kwargs.pop('children', False)
 
         if (keys or kwargs):
             key = cache_key(*keys, **kwargs)
@@ -192,6 +232,17 @@ def cache_function(length=CACHE_TIMEOUT):
 
 
 def cache_get(*keys, **kwargs):
+    """
+    Gets the object identified by all ``keys`` from the cache.
+
+    kwargs:
+        default:
+            Default value used if the object is not in the cache. If the object
+            is not found and ``default`` is not set or is None, the exception
+            ``NotCachedError`` is raised with the attribute ``.key = keys``.
+        other kwargs:
+            Unknown key=val is interpreted like two aditional keys: (key, val)
+    """
     if kwargs.has_key('default'):
         default_value = kwargs.pop('default')
         use_default = True
@@ -245,7 +296,18 @@ def cache_get(*keys, **kwargs):
 
 
 def cache_set(*keys, **kwargs):
-    """Set an object into the cache."""
+    """Set the object identified by all ``keys`` into the cache.
+
+    kwargs:
+        value:
+            The object to be cached.
+        length:
+            Timeout for the object. Default is CACHE_TIMEOUT.
+        skiplog:
+            If it is True the call is never logged. Default is False.
+        other kwargs:
+            Unknown key=val is interpreted like two aditional keys: (key, val)
+    """
     if cache_enabled():
         global CACHED_KEYS, REQUEST_CACHE
         obj = kwargs.pop('value')
