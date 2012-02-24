@@ -271,35 +271,17 @@ def _hash_or_string(key):
         except AttributeError:
             return md5_hash(key)
 
-# this function is unused in all known apps and raises an
-# exception on CACHED_KEYS if used:
-# AttributeError: 'list' object has no attribute 'has_key'
-def cache_contains(*keys, **kwargs):
-    key = cache_key(keys, **kwargs)
-    return CACHED_KEYS.has_key(key)
-
 def cache_key(*keys, **pairs):
     """Smart key maker, returns the object itself if a key, else a list
     delimited by ':', automatically hashing any non-scalar objects."""
 
-    if is_string_like(keys):
-        assert False, "This code is never visited due to python rules"
-        keys = [keys]
-
-    if is_list_or_tuple(keys):
-        if len(keys) == 1 and is_list_or_tuple(keys[0]):
-            keys = keys[0]
-    else:
-        assert False, "This code is never visited due to python rules"
-        keys = [md5_hash(keys)]
+    if len(keys) == 1 and is_list_or_tuple(keys[0]):
+        keys = keys[0]
 
     if pairs:
         keys = list(keys)
-        klist = pairs.keys()
-        klist.sort()
-        for k in klist:
-            keys.append(k)
-            keys.append(pairs[k])
+        for k in sorted(pairs.keys()):
+            keys.extend((k, pairs[k]))
 
     key = KEY_DELIM.join([_hash_or_string(x) for x in keys])
     prefix = CACHE_PREFIX + KEY_DELIM
