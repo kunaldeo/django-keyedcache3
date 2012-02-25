@@ -14,6 +14,14 @@ Example:
 
 More info below about parameters.
 """
+# For keyedcache developers:
+# No additional keyword parameters should be added to the definition of
+# cache_set, cache_get, cache_delete or cache_key in the future.
+# Otherwise you must know what are you doing! Any appplication that would use
+# a new parameter will must check on startup that keyedcache is not older than
+# a required version !!(Otherwise kwargs unknown by an old version keyedcache
+# will be used as keys and cache_set/cache_get will use different keys, which
+# causes nothing cached.)
 
 from django.conf import settings
 from django.core.cache import cache
