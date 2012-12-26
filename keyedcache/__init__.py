@@ -16,7 +16,7 @@ More info below about parameters.
 """
 
 from django.conf import settings
-from django.core.cache import cache
+from django.core.cache.backends.base import InvalidCacheBackendError
 from django.utils.encoding import smart_str
 from django.utils.hashcompat import md5_constructor
 from keyedcache.utils import is_string_like, is_list_or_tuple
@@ -39,6 +39,14 @@ CACHE_HITS = 0
 
 KEY_DELIM = "::"
 REQUEST_CACHE = {'enabled' : False}
+
+try:
+    from django.core.cache import get_cache
+    cache_alias = getattr(settings, 'KEYEDCACHE_ALIAS', 'default')
+    cache = get_cache(cache_alias)
+except InvalidCacheBackendError:
+    from django.core.cache import cache
+
 try:
     CACHES = getattr(settings, "CACHES")
     CACHE_BACKEND = CACHES['default']['BACKEND']
