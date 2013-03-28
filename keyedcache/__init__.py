@@ -18,9 +18,9 @@ More info below about parameters.
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.encoding import smart_str
-from django.utils.hashcompat import md5_constructor
 from keyedcache.utils import is_string_like, is_list_or_tuple
 import cPickle as pickle
+import hashlib
 import logging
 import types
 
@@ -353,7 +353,7 @@ def cache_key(*keys, **pairs):
 
 def md5_hash(obj):
     pickled = pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL)
-    return md5_constructor(pickled).hexdigest()
+    return hashlib.md5(pickled).hexdigest()
 
 
 def is_memcached_backend():
