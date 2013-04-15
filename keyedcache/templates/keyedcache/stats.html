@@ -1,15 +1,15 @@
-{% extends "admin/base_site.html" %}
+{% extends "admin/base_site.html" %}{% load url from future %}
 {% load i18n %}
 
 {% block breadcrumbs %}{% if not is_popup %}
 <div class="breadcrumbs">
-    <a href="{% url admin:index %}">{% trans "Home" %}</a> &rsaquo;
+    <a href="{% url 'admin:index' %}">{% trans "Home" %}</a> &rsaquo;
     {% trans "Cache Stats" %}
 </div>
 {% endif %}{% endblock %}
 
 {% block content %}
-<p>[<a href="{% url keyedcache_view %}">View Cache</a>] [<a href="{% url keyedcache_delete %}">Delete from Cache</a>]
+<p>[<a href="{% url 'keyedcache_view' %}">View Cache</a>] [<a href="{% url 'keyedcache_delete' %}">Delete from Cache</a>]
 <h1>Cache Stats</h1>
 <p>Backend: {{ cache_backend }} ({% if cache_running %}running{% else %}down{% endif %})</p>
 <p>Timeout: {{ cache_time }}</p>
