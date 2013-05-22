@@ -11,7 +11,7 @@ from django.core.signals import request_started, request_finished
 from keyedcache import cache_clear_request, cache_use_request_caching
 import random
 import logging
-log = logging.getLogger('keyedcache.threaded')
+log = logging.getLogger(__name__)
 
 def set_request_uid(sender, *args, **kwargs):
     """Puts a unique id into the thread"""

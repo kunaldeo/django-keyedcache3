@@ -8,7 +8,7 @@ from django.utils.translation import ugettext_lazy as _
 import keyedcache
 import logging
 
-log = logging.getLogger('keyedcache.views')
+log = logging.getLogger(__name__)
 
 YN = (
     ('Y', _('Yes')),

@@ -1,7 +1,7 @@
 import keyedcache
 import logging
 
-log = logging.getLogger('keyedcache')
+log = logging.getLogger(__name__)
 
 class CachedObjectMixin(object):
     """Provides basic object keyedcache for any objects using this as a mixin.

@@ -26,13 +26,16 @@ More info below about parameters.
 from django.conf import settings
 from django.core.cache import cache
 from django.utils.encoding import smart_str
+from django.utils.log import NullHandler
 from hashlib import md5
 from keyedcache.utils import is_string_like, is_list_or_tuple
 import cPickle as pickle
 import logging
 import types
 
-log = logging.getLogger('keyedcache')
+log = logging.getLogger(__name__)
+log.setLevel(logging.INFO)
+log.addHandler(NullHandler())
 
 # The debugging variable CACHED_KEYS is exact only with the the Django
 # debugging server (or any single worker process server) and without restarting
