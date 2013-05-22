@@ -69,7 +69,7 @@ def keyedcache_configure():
     if CACHE_TIMEOUT == 0:
         log.warn("disabling the cache system because TIMEOUT=0")
         
-    _CACHE_ENABLED = CACHE_TIMEOUT > 0
+    _CACHE_ENABLED = CACHE_TIMEOUT > 0 and not cache.__module__.endswith('dummy')
 
     if not cache.key_prefix and (hasattr(settings, 'CACHE_PREFIX') or settings.SITE_ID != 1):
         if hasattr(settings, 'CACHE_PREFIX'):
