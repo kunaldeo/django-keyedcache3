@@ -163,3 +163,11 @@ LOGGING = {
         }
     }
 }
+
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+        'TIMEOUT': 300,
+        'KEY_PREFIX': str(SITE_ID),
+    }
+}
