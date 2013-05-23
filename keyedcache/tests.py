@@ -152,6 +152,8 @@ class TestKeyMaker(TestCase):
 
 
 class TestClient(TestCase):
+    urls = 'keyedcache.tests_urls'
+
     def test_basic_views(self):
         # Authentized user is not enough
         user = User.objects.create_user('alice', 'alice@example.com', 'secret')
