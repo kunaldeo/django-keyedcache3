@@ -32,7 +32,6 @@ from hashlib import md5
 from keyedcache.utils import is_string_like, is_list_or_tuple
 from warnings import warn
 import cPickle as pickle
-import hashlib
 import logging
 import types
 
