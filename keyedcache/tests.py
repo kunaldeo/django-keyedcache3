@@ -1,6 +1,10 @@
 import keyedcache
 import random
 from django.test import TestCase
+from django.contrib.auth.models import User
+from django.core.urlresolvers import reverse
+from keyedcache.views import stats_page, view_page, delete_page
+
 import time
 
 CACHE_HIT=0
@@ -147,4 +151,21 @@ class TestKeyMaker(TestCase):
         self.assertEqual(v, 'test::3::more::yes')
 
 
-
+class TestClient(TestCase):
+    def test_basic_views(self):
+        # Authentized user is not enough
+        user = User.objects.create_user('alice', 'alice@example.com', 'secret')
+        user.save()
+        self.client.login(username='alice', password='secret')
+        response = self.client.get(reverse(stats_page))
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue('/login/' in response._headers['location'][1])
+        # User must be in staff
+        user.is_staff = True
+        user.save()
+        response = self.client.get(reverse(stats_page))
+        self.assertContains(response, 'Cache Hit Rate')
+        response = self.client.get(reverse(view_page))
+        self.assertContains(response, 'Cache Keys')
+        response = self.client.get(reverse(delete_page))
+        self.assertContains(response, 'Key to delete:')

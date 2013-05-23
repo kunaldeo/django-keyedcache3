@@ -57,7 +57,7 @@ def stats_page(request):
         'cache_count' : len(keyedcache.CACHED_KEYS),
         'cache_running' : running,
         'cache_time' : keyedcache.CACHE_TIMEOUT,
-        'cache_backend' : keyedcache.CACHE_BACKEND,
+        'cache_backend' : keyedcache.cache.__module__,
         'cache_calls' : keyedcache.CACHE_CALLS,
         'cache_hits' : keyedcache.CACHE_HITS,
         'hit_rate' : "%02.1f" % rate

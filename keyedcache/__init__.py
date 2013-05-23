@@ -75,13 +75,13 @@ def keyedcache_configure():
 
     if not cache.key_prefix and (hasattr(settings, 'CACHE_PREFIX') or settings.SITE_ID != 1):
         if hasattr(settings, 'CACHE_PREFIX'):
-            warn("""The setting "CACHE_PREFIX" is obsoleted and ignored by keyedcache."""
-                 """ Use "CACHES = {'default': {... 'KEY_PREFIX': '...'}}" instead.""")
+            warn("The setting `CACHE_PREFIX` is obsoleted and is ignored by keyedcache.\n"
+                 """Use "CACHES = {'default': {... 'KEY_PREFIX': '...'}}" instead.""")
         if settings.SITE_ID != 1:
-            warn("If you use multiple sites, an explicit KEY_PREFIX should be defined"
-                 " in \"CACHES = {'default': {... 'KEY_PREFIX': '...'}}\" in order to"
-                 " differentiate caches or to explicitely confirm they should be shared."
-                 " An easy solution is \"'CACHE_PREFIX': str(settings.SITE_ID)\".")
+            hint = ("Use \"CACHES = {'default': {... 'KEY_PREFIX': '...'}}\" in order to\n"
+                    "differentiate caches or to explicitely confirm they should be shared.\n"
+                    " An easy solution is \"'CACHE_PREFIX': str(settings.SITE_ID)\".")
+            warn("An explicit KEY_PREFIX should be defined if you use multiple sites.\n%s" % hint)
         if not cache.__module__.split('.')[-1] in ('locmem', 'dummy'):
             raise ImproperlyConfigured(
                     "Setting KEY_PREFIX is obligatory for production caches. See the previous warning.")
