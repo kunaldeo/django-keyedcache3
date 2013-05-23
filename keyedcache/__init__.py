@@ -20,8 +20,8 @@ More info below about parameters.
 # Otherwise you must know what are you doing! Any appplication that would use
 # a new parameter will must check on startup that keyedcache is not older than
 # a required version !!(Otherwise kwargs unknown by an old version keyedcache
-# will be used as keys and cache_set/cache_get will use different keys, which
-# causes nothing cached.)
+# will be used as keys and cache_set/cache_get will use different keys that
+# would cause serious problems.)
 
 from django.conf import settings
 from django.core.cache import get_cache, InvalidCacheBackendError, DEFAULT_CACHE_ALIAS
@@ -32,6 +32,7 @@ from hashlib import md5
 from keyedcache.utils import is_string_like, is_list_or_tuple
 from warnings import warn
 import cPickle as pickle
+import hashlib
 import logging
 import types
 
@@ -65,6 +66,8 @@ def keyedcache_configure():
         log.warn("Warning: Could not find backend '%s': uses %s" % (cache_alias, DEFAULT_CACHE_ALIAS))
         cache_alias = DEFAULT_CACHE_ALIAS  # it is 'default'
         from django.core.cache import cache
+
+
     CACHE_TIMEOUT = cache.default_timeout
     if CACHE_TIMEOUT == 0:
         log.warn("disabling the cache system because TIMEOUT=0")

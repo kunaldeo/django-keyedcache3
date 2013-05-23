@@ -19,3 +19,6 @@ build
 satchmo
 local_bursar_*py
 .DS_Store
+.tox
+.coverage
+htmlcov

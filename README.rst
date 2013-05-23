@@ -124,7 +124,7 @@ Python 2.5, 2.6 or 2.7; Django 1.4 or 1.5
 
 (optional) If you want to use the threaded first-level cache, you need to install `threaded_multihost`_.
 
-It is recommended to set a 'KEY_PREFIX' to a unique string in your settings.py file.
+It is recommended to set a 'KEY_PREFIX' to any unique string in your settings.py file.
 For production caches or for sites with different values SITE_ID it is even obligatory.
 This allows you to avoid collisions when running more than one site with the same backend.
 An easy solution is `CACHES = {'defalt': {... 'KEY_PREFIX': str(settings.SITE_ID)}}`.
@@ -137,4 +137,5 @@ ver. 1.5.0
 
 * The cache configuration is made compatible with current versions of Django.
 It is currently configured by the varible CACHES. The variable CACHE_PREFIX
-is currently obsoleted by CACHES.
+is currently obsoleted 
+CACHES.

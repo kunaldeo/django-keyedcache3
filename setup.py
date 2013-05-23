@@ -26,7 +26,11 @@ setup(
                    'License :: OSI Approved :: BSD License',
                    'Operating System :: OS Independent',
                    'Programming Language :: Python',
+                   'Programming Language :: Python :: 2.5',
+                   'Programming Language :: Python :: 2.6',
+                   'Programming Language :: Python :: 2.7',
                    'Framework :: Django'],
     packages = find_packages(),
+    install_requires = ['django'],  # >=1.4 <1.6
     include_package_data = True,
 )
