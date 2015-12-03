@@ -24,10 +24,9 @@ More info below about parameters.
 # would cause serious problems.)
 
 from django.conf import settings
-from django.core.cache import get_cache, InvalidCacheBackendError, DEFAULT_CACHE_ALIAS
+from django.core.cache import caches, InvalidCacheBackendError, DEFAULT_CACHE_ALIAS
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import smart_str
-from django.utils.log import NullHandler
 from hashlib import md5
 from keyedcache.utils import is_string_like, is_list_or_tuple
 from warnings import warn
@@ -37,7 +36,7 @@ import types
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
-log.addHandler(NullHandler())
+log.addHandler(logging.NullHandler())
 
 # The debugging variable CACHED_KEYS is exact only with the the Django
 # debugging server (or any single worker process server) and without restarting
@@ -55,12 +54,13 @@ REQUEST_CACHE = {'enabled' : False}
 
 cache, cache_alias, CACHE_TIMEOUT, _CACHE_ENABLED = 4 * (None,)
 
+
 def keyedcache_configure():
     "Initial configuration (or reconfiguration during tests)."
     global cache, cache_alias, CACHE_TIMEOUT, _CACHE_ENABLED
     cache_alias = getattr(settings, 'KEYEDCACHE_ALIAS', DEFAULT_CACHE_ALIAS)
     try:
-        cache = get_cache(cache_alias)
+        cache = caches[cache_alias]
     except InvalidCacheBackendError:
         log.warn("Warning: Could not find backend '%s': uses %s" % (cache_alias, DEFAULT_CACHE_ALIAS))
         cache_alias = DEFAULT_CACHE_ALIAS  # it is 'default'

@@ -15,7 +15,7 @@ log = logging.getLogger(__name__)
 
 def set_request_uid(sender, *args, **kwargs):
     """Puts a unique id into the thread"""
-    tid = random.randrange(1,10000000)
+    tid = random.randrange(1, 10000000)
     threadlocals.set_thread_variable('request_uid', tid)
     #log.debug('request UID: %s', tid)
 
