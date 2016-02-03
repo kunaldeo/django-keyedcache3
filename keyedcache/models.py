@@ -44,7 +44,7 @@ def find_by_id(cls, groupkey, objectid, raises=False):
     ob = None
     try:
         ob = keyedcache.cache_get(groupkey, objectid)
-    except keyedcache.NotCachedError, e:
+    except keyedcache.NotCachedError as e:
         try: 
             ob = cls.objects.get(pk=objectid)
             keyedcache.cache_set(e.key, value=ob)
@@ -62,7 +62,7 @@ def find_by_key(cls, groupkey, key, raises=False):
     ob = None
     try:
         ob = keyedcache.cache_get(groupkey, key)
-    except keyedcache.NotCachedError, e:
+    except keyedcache.NotCachedError as e:
         try: 
             ob = cls.objects.get(key__exact=key)
             keyedcache.cache_set(e.key, value=ob)
@@ -79,7 +79,7 @@ def find_by_slug(cls, groupkey, slug, raises=False):
     ob = None
     try:
         ob = keyedcache.cache_get(groupkey, slug)
-    except keyedcache.NotCachedError, e:
+    except keyedcache.NotCachedError as e:
         try: 
             ob = cls.objects.get(slug__exact=slug)
             keyedcache.cache_set(e.key, value=ob)

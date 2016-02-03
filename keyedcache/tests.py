@@ -80,11 +80,11 @@ class CachingTest(TestCase):
                 keyedcache.cache_set('del', 'x', x, 'y', y, value=True)
 
         # check to make sure all the values are in the cache
-        self.assert_(keyedcache.cache_get('del', default=False))
+        self.assertTrue(keyedcache.cache_get('del', default=False))
         for x in range(0,10):
-            self.assert_(keyedcache.cache_get('del', 'x', x, default=False))
+            self.assertTrue(keyedcache.cache_get('del', 'x', x, default=False))
             for y in range(0,5):
-                self.assert_(keyedcache.cache_get('del', 'x', x, 'y', y, default=False))
+                self.assertTrue(keyedcache.cache_get('del', 'x', x, 'y', y, default=False))
 
         # try to delete just one
         killed = keyedcache.cache_delete('del','x',1)
@@ -92,7 +92,7 @@ class CachingTest(TestCase):
         self.assertFalse(keyedcache.cache_get('del', 'x', 1, default=False))
 
         # but the others are still there
-        self.assert_(keyedcache.cache_get('del', 'x', 2, default=False))
+        self.assertTrue(keyedcache.cache_get('del', 'x', 2, default=False))
 
         # now kill all of del::x::1
         killed = keyedcache.cache_delete('del','x', 1, children=True)
@@ -100,7 +100,7 @@ class CachingTest(TestCase):
             self.assertFalse(keyedcache.cache_get('del', 'x', 1, 'y', y, default=False))
 
         # but del::x::2 and children are there
-        self.assert_(keyedcache.cache_get('del','x',2,'y',1, default=False))
+        self.assertTrue(keyedcache.cache_get('del','x',2,'y',1, default=False))
 
         # kill the rest
         killed = keyedcache.cache_delete('del', children=True)
@@ -123,7 +123,7 @@ class TestCacheDisable(TestCase):
         try:
             keyedcache.cache_get('disabled')
             self.fail('should have raised NotCachedError')
-        except keyedcache.NotCachedError, nce:
+        except keyedcache.NotCachedError as nce:
             key = keyedcache.cache_key('disabled')
             self.assertEqual(nce.key, key)
 

@@ -68,7 +68,7 @@ def stats_page(request):
 stats_page = user_passes_test(lambda u: u.is_authenticated() and u.is_staff, login_url='/accounts/login/')(stats_page)
 
 def view_page(request):
-    keys = keyedcache.CACHED_KEYS.keys()
+    keys = list(keyedcache.CACHED_KEYS.keys())
 
     keys.sort()
 
