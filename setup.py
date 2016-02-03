@@ -28,7 +28,6 @@ setup(
                    'Programming Language :: Python',
                    'Programming Language :: Python :: 3.4',
                    'Programming Language :: Python :: 3.5',
-                   'Programming Language :: Python :: 3.5.1',
                    'Framework :: Django'],
     packages = find_packages(),
     install_requires = ['django>=1.8'],
