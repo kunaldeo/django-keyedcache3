@@ -1,19 +1,19 @@
+import logging
+
+import keyedcache
 from django import forms
-from django.conf import settings
 from django.contrib.auth.decorators import user_passes_test
 from django.http import HttpResponseRedirect
-from django.shortcuts import render_to_response
-from django.template import RequestContext
+from django.shortcuts import render
 from django.utils.translation import ugettext_lazy as _
-import keyedcache
-import logging
 
 log = logging.getLogger(__name__)
 
 YN = (
     ('Y', _('Yes')),
     ('N', _('No')),
-    )
+)
+
 
 class CacheDeleteForm(forms.Form):
     tag = forms.CharField(label=_('Key to delete'), required=False)
@@ -38,12 +38,13 @@ class CacheDeleteForm(forms.Form):
         log.debug(result)
         return result
 
+
 def stats_page(request):
     calls = keyedcache.CACHE_CALLS
     hits = keyedcache.CACHE_HITS
 
     if (calls and hits):
-        rate =  float(keyedcache.CACHE_HITS)/keyedcache.CACHE_CALLS*100
+        rate = float(keyedcache.CACHE_HITS) / keyedcache.CACHE_CALLS * 100
     else:
         rate = 0
 
@@ -53,32 +54,36 @@ def stats_page(request):
     except keyedcache.CacheNotRespondingError:
         running = False
 
-    ctx = RequestContext(request, {
-        'cache_count' : len(keyedcache.CACHED_KEYS),
-        'cache_running' : running,
-        'cache_time' : keyedcache.CACHE_TIMEOUT,
-        'cache_backend' : keyedcache.cache.__module__,
-        'cache_calls' : keyedcache.CACHE_CALLS,
-        'cache_hits' : keyedcache.CACHE_HITS,
-        'hit_rate' : "%02.1f" % rate
-    })
+    ctx = {
+        'cache_count': len(keyedcache.CACHED_KEYS),
+        'cache_running': running,
+        'cache_time': keyedcache.CACHE_TIMEOUT,
+        'cache_backend': keyedcache.cache.__module__,
+        'cache_calls': keyedcache.CACHE_CALLS,
+        'cache_hits': keyedcache.CACHE_HITS,
+        'hit_rate': "%02.1f" % rate
+    }
 
-    return render_to_response('keyedcache/stats.html', context_instance=ctx)
+    return render(request, 'keyedcache/stats.html', ctx)
+
 
 stats_page = user_passes_test(lambda u: u.is_authenticated() and u.is_staff, login_url='/accounts/login/')(stats_page)
+
 
 def view_page(request):
     keys = list(keyedcache.CACHED_KEYS.keys())
 
     keys.sort()
 
-    ctx = RequestContext(request, {
-        'cached_keys' : keys,
-    })
+    ctx = {
+        'cached_keys': keys,
+    }
 
-    return render_to_response('keyedcache/view.html', context_instance=ctx)
+    return render(request, 'keyedcache/view.html', ctx)
+
 
 view_page = user_passes_test(lambda u: u.is_authenticated() and u.is_staff, login_url='/accounts/login/')(view_page)
+
 
 def delete_page(request):
     log.debug("delete_page")
@@ -94,10 +99,11 @@ def delete_page(request):
         log.debug("new form")
         form = CacheDeleteForm()
 
-    ctx = RequestContext(request, {
-        'form' : form,
-    })
+    ctx = {
+        'form': form,
+    }
 
-    return render_to_response('keyedcache/delete.html', context_instance=ctx)
+    return render(request, 'keyedcache/delete.html', ctx)
+
 
 delete_page = user_passes_test(lambda u: u.is_authenticated() and u.is_staff, login_url='/accounts/login/')(delete_page)

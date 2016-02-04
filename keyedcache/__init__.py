@@ -23,16 +23,16 @@ More info below about parameters.
 # will be used as keys and cache_set/cache_get will use different keys that
 # would cause serious problems.)
 
+import logging
+import pickle as pickle
+from hashlib import md5
+from warnings import warn
+
 from django.conf import settings
 from django.core.cache import caches, InvalidCacheBackendError, DEFAULT_CACHE_ALIAS
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.encoding import smart_str
-from hashlib import md5
 from keyedcache.utils import is_string_like, is_list_or_tuple
-from warnings import warn
-import pickle as pickle
-import logging
-import types
 
 log = logging.getLogger(__name__)
 log.setLevel(logging.INFO)
@@ -50,7 +50,7 @@ CACHE_CALLS = 0
 CACHE_HITS = 0
 
 KEY_DELIM = "::"
-REQUEST_CACHE = {'enabled' : False}
+REQUEST_CACHE = {'enabled': False}
 
 cache, cache_alias, CACHE_TIMEOUT, _CACHE_ENABLED = 4 * (None,)
 
@@ -66,11 +66,10 @@ def keyedcache_configure():
         cache_alias = DEFAULT_CACHE_ALIAS  # it is 'default'
         from django.core.cache import cache
 
-
     CACHE_TIMEOUT = cache.default_timeout
     if CACHE_TIMEOUT == 0:
         log.warn("disabling the cache system because TIMEOUT=0")
-        
+
     _CACHE_ENABLED = CACHE_TIMEOUT > 0 and not cache.__module__.endswith('dummy')
 
     if not cache.key_prefix and (hasattr(settings, 'CACHE_PREFIX') or settings.SITE_ID != 1):
@@ -84,7 +83,8 @@ def keyedcache_configure():
             warn("An explicit KEY_PREFIX should be defined if you use multiple sites.\n%s" % hint)
         if not cache.__module__.split('.')[-1] in ('locmem', 'dummy'):
             raise ImproperlyConfigured(
-                    "Setting KEY_PREFIX is obligatory for production caches. See the previous warning.")
+                "Setting KEY_PREFIX is obligatory for production caches. See the previous warning.")
+
 
 keyedcache_configure()
 
@@ -108,6 +108,7 @@ class CacheWrapper(object):
 
     wrap = classmethod(wrap)
 
+
 class MethodNotFinishedError(Exception):
     def __init__(self, f):
         self.func = f
@@ -117,8 +118,10 @@ class NotCachedError(Exception):
     def __init__(self, k):
         self.key = k
 
+
 class CacheNotRespondingError(Exception):
     pass
+
 
 def cache_delete(*keys, **kwargs):
     """
@@ -183,19 +186,23 @@ def cache_delete(*keys, **kwargs):
 def cache_delete_function(func):
     return cache_delete(['func', func.__name__, func.__module__], children=True)
 
+
 def cache_enabled():
     global _CACHE_ENABLED
     return _CACHE_ENABLED
 
+
 def cache_enable(state=True):
     global _CACHE_ENABLED
-    _CACHE_ENABLED=state
+    _CACHE_ENABLED = state
+
 
 def _cache_flush_all():
     if is_memcached_backend():
         cache._cache.flush_all()
         return False
     return True
+
 
 def cache_function(length=CACHE_TIMEOUT):
     """
@@ -215,6 +222,7 @@ def cache_function(length=CACHE_TIMEOUT):
     wait until the function finishes. If this is not desired behavior, you can
     remove the first two lines after the ``else``.
     """
+
     def decorator(func):
         def inner_func(*args, **kwargs):
             if not cache_enabled():
@@ -238,7 +246,9 @@ def cache_function(length=CACHE_TIMEOUT):
                     value = func(*args, **kwargs)
 
             return value
+
         return inner_func
+
     return decorator
 
 
@@ -334,15 +344,17 @@ def cache_set(*keys, **kwargs):
         if REQUEST_CACHE['enabled']:
             cache_set_request(key, val)
 
+
 def _hash_or_string(key):
     if is_string_like(key) or isinstance(key, (int, float)):
         return smart_str(key)
     else:
         try:
-            #if it has a PK, use it.
+            # if it has a PK, use it.
             return str(key._get_pk_val())
         except AttributeError:
             return md5_hash(key)
+
 
 def cache_key(*keys, **pairs):
     """Smart key maker, returns the object itself if a key, else a list
@@ -359,6 +371,7 @@ def cache_key(*keys, **pairs):
     key = KEY_DELIM.join([_hash_or_string(x) for x in keys])
     return key.replace(" ", ".")
 
+
 def md5_hash(obj):
     pickled = pickle.dumps(obj, protocol=pickle.HIGHEST_PROTOCOL)
     return md5(pickled).hexdigest()
@@ -370,17 +383,19 @@ def is_memcached_backend():
     except AttributeError:
         return False
 
+
 def cache_require():
     """Error if keyedcache isn't running."""
     if cache_enabled():
         key = cache_key('require_cache')
-        cache_set(key,value='1')
-        v = cache_get(key, default = '0')
+        cache_set(key, value='1')
+        v = cache_get(key, default='0')
         if v != '1':
             raise CacheNotRespondingError()
         else:
             log.debug("Cache responding OK")
         return True
+
 
 def cache_clear_request(uid):
     """Clears all locally cached elements with that uid"""
@@ -391,9 +406,11 @@ def cache_clear_request(uid):
     except KeyError:
         pass
 
+
 def cache_use_request_caching():
     global REQUEST_CACHE
     REQUEST_CACHE['enabled'] = True
+
 
 # def cache_get_request_uid():
 #     from threaded_multihost import threadlocals
@@ -404,9 +421,9 @@ def cache_set_request(key, val, uid=None):
         # uid = cache_get_request_uid()
         pass
 
-    if uid>-1:
+    if uid > -1:
         global REQUEST_CACHE
         if not uid in REQUEST_CACHE:
-            REQUEST_CACHE[uid] = {key:val}
+            REQUEST_CACHE[uid] = {key: val}
         else:
             REQUEST_CACHE[uid][key] = val

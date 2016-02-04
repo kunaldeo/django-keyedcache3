@@ -2,14 +2,11 @@
 URLConf for Caching app
 """
 
-try:
-	from django.conf.urls import patterns
-except ImportError:
-	from django.conf.urls.defaults import patterns
+from django.conf.urls import url
+from keyedcache import views
 
-
-urlpatterns = patterns('keyedcache.views',
-    (r'^$', 'stats_page', {}, 'keyedcache_stats'),
-    (r'^view/$', 'view_page', {}, 'keyedcache_view'),
-    (r'^delete/$', 'delete_page', {}, 'keyedcache_delete'),
-)
+urlpatterns = [
+    url(r'^$', views.stats_page, {}, 'keyedcache_stats'),
+    url(r'^view/$', views.view_page, {}, 'keyedcache_view'),
+    url(r'^delete/$', views.delete_page, {}, 'keyedcache_delete'),
+]

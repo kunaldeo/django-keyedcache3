@@ -1,7 +1,9 @@
-import keyedcache
 import logging
 
+import keyedcache
+
 log = logging.getLogger(__name__)
+
 
 class CachedObjectMixin(object):
     """Provides basic object keyedcache for any objects using this as a mixin.
@@ -31,10 +33,10 @@ class CachedObjectMixin(object):
         val = kwargs.pop('value', self)
         key = self.cache_key(*args, **kwargs)
         keyedcache.cache_set(key, value=val)
-        
+
     def is_cached(self, *args, **kwargs):
         return keyedcache.is_cached(self.cache_key(*args, **kwargs))
-        
+
 
 # Unused functions find_by_id, find_by_key, find_by_slug are coming from
 # Satchmo but are currently unused also there.
@@ -45,7 +47,7 @@ def find_by_id(cls, groupkey, objectid, raises=False):
     try:
         ob = keyedcache.cache_get(groupkey, objectid)
     except keyedcache.NotCachedError as e:
-        try: 
+        try:
             ob = cls.objects.get(pk=objectid)
             keyedcache.cache_set(e.key, value=ob)
 
@@ -63,7 +65,7 @@ def find_by_key(cls, groupkey, key, raises=False):
     try:
         ob = keyedcache.cache_get(groupkey, key)
     except keyedcache.NotCachedError as e:
-        try: 
+        try:
             ob = cls.objects.get(key__exact=key)
             keyedcache.cache_set(e.key, value=ob)
 
@@ -73,14 +75,15 @@ def find_by_key(cls, groupkey, key, raises=False):
                 raise
 
     return ob
-    
+
+
 def find_by_slug(cls, groupkey, slug, raises=False):
     """A helper function to look up an object by slug"""
     ob = None
     try:
         ob = keyedcache.cache_get(groupkey, slug)
     except keyedcache.NotCachedError as e:
-        try: 
+        try:
             ob = cls.objects.get(slug__exact=slug)
             keyedcache.cache_set(e.key, value=ob)
 
@@ -90,4 +93,3 @@ def find_by_slug(cls, groupkey, slug, raises=False):
                 raise
 
     return ob
-
