@@ -67,7 +67,7 @@ def stats_page(request):
     return render(request, 'keyedcache/stats.html', ctx)
 
 
-stats_page = user_passes_test(lambda u: u.is_authenticated() and u.is_staff, login_url='/accounts/login/')(stats_page)
+stats_page = user_passes_test(lambda u: u.is_authenticated() and u.is_staff if callable(u.is_authenticated) else u.is_authenticated and u.is_staff, login_url='/accounts/login/')(stats_page)
 
 
 def view_page(request):
@@ -82,7 +82,7 @@ def view_page(request):
     return render(request, 'keyedcache/view.html', ctx)
 
 
-view_page = user_passes_test(lambda u: u.is_authenticated() and u.is_staff, login_url='/accounts/login/')(view_page)
+view_page = user_passes_test(lambda u: u.is_authenticated() and u.is_staff if callable(u.is_authenticated) else u.is_authenticated and u.is_staff, login_url='/accounts/login/')(view_page)
 
 
 def delete_page(request):
@@ -106,4 +106,4 @@ def delete_page(request):
     return render(request, 'keyedcache/delete.html', ctx)
 
 
-delete_page = user_passes_test(lambda u: u.is_authenticated() and u.is_staff, login_url='/accounts/login/')(delete_page)
+delete_page = user_passes_test(lambda u: u.is_authenticated() and u.is_staff if callable(u.is_authenticated) else u.is_authenticated and u.is_staff, login_url='/accounts/login/')(delete_page)
