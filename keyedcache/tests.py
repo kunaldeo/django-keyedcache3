@@ -3,7 +3,7 @@ import time
 
 import keyedcache
 from django.contrib.auth.models import User
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.test import TestCase
 from django.test.utils import override_settings
 from keyedcache.views import stats_page, view_page, delete_page
