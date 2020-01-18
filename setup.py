@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='django-keyedcache3',
-    version="1.5.3",
+    version="1.5.4",
     description="keyedcache",
     long_description="""Python 3 version of Django Keyedcache provides utilities and class mixins for simplified development of cache-aware objects.  Used in Satchmo.""",
     author='Kunal Deo',
